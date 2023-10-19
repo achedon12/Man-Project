@@ -26,24 +26,20 @@ class Board:
             if current_station == bus.get_start_route():
                 print(f"[READY] bus is now ready to do the route. Departure from {bus.get_start_route()}")
 
-            #  decharge
-            # some_one_exit = False
-            # if bus.get_previous_station() != bus.get_current_station():
-            #     for person in self.persons:
-            #         if person.is_in_bus_number(bus.bus_number):
-            #             current_travel = person.get_current_travel()
-            #             if current_travel.get_bus_route_arrive() == current_station:
-            #                 if not some_one_exit:
-            #                     some_one_exit = True
-            #                     bus.remove_passenger(person)
-            #                     person.set_in_bus(False)
-            #                     current_travel.set_etat(Travel.TRAVEL_DONE)
-            #                     print(f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at "
-            #                           f"{bus.get_current_station()} ({len(bus.get_passengers())}/{bus.get_max_passengers()})")
-            #                     break
-
             # decharge
+            for person in bus.get_passengers():
+                current_travel = person.get_current_travel()
 
+                if current_travel is not None and current_travel.get_bus_route_arrive() == current_station:
+                    bus.set_is_decharging(True)
+                    bus.remove_passenger(person)
+                    person.set_in_bus(False)
+                    print(f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at "
+                          f"{current_station} ({len(bus.get_passengers())}/{bus.get_max_passengers()})")
+                    person.get_current_travel().set_etat(Travel.TRAVEL_DONE)
+                    break
+                if person.name == bus.get_passengers()[-1].name:
+                    bus.set_is_decharging(False)
 
             # charge
             for person in self.persons:
@@ -51,22 +47,27 @@ class Board:
                     if not bus.is_full():
                         bus.set_is_charging(True)
                         some_one_enter = False
-
                         for travel in person.get_travels():
-                            if travel.get_bus_route_depart() == current_station and bus.is_bus_stop(
-                                    travel.get_bus_route_arrive()):
-                                if bus.get_available_seats() > 0:
-                                    bus.add_passenger(person)
-                                    some_one_enter = True
-                                    person.set_in_bus(bus.get_bus_number())
-                                    travel.set_etat(Travel.TRAVEL_IN_PROGRESS)
-                                    print(f"[CHARGING] {person.get_name()} enter in the bus {bus.get_bus_number()} at "
-                                          f"{bus.get_current_station()} ({len(bus.get_passengers())}/{bus.get_max_passengers()})")
+                            if float(actual_time) < float(travel.get_departure_time()):
+                                continue
+
+                            if not travel.is_done():
+                                if travel.get_bus_route_depart() == current_station and bus.is_bus_stop(
+                                        travel.get_bus_route_arrive()):
+                                    if bus.get_available_seats() > 0:
+                                        bus.add_passenger(person)
+                                        some_one_enter = True
+                                        person.set_in_bus(bus.get_bus_number())
+                                        travel.set_etat(Travel.TRAVEL_IN_PROGRESS)
+                                        print(
+                                            f"[CHARGING] {person.get_name()} enter in the bus {bus.get_bus_number()} at "
+                                            f"{bus.get_current_station()} ({len(bus.get_passengers())}/{bus.get_max_passengers()})"
+                                            f" for a travel from {travel.get_bus_route_depart()} to {travel.get_bus_route_arrive()}")
+                                        break
+                                    else:
+                                        print(f"[INFO] bus is full, {person.get_name()} can't enter")
+                                if some_one_enter:
                                     break
-                                else:
-                                    print(f"[INFO] bus is full, {person.get_name()} can't enter")
-                            if some_one_enter:
-                                break
                         if some_one_enter:
                             break
                         if person.name == self.persons[-1].name:
@@ -74,17 +75,18 @@ class Board:
                             break
 
             # next station
-            if not bus.is_charging():
+            if not bus.is_charging() and not bus.is_decharging():
                 bus.move_station()
                 print(
-                    f"[INFO] bus is following the route {bus.get_previous_station()} to {bus.get_current_station()} from "
+                    f"[INFO] bus is following the route {bus.get_previous_station_from_history()} to {bus.get_current_station()} from "
                     f"his route {bus.get_route()} with {len(bus.get_passengers())} passengers")
             elif bus.is_full():
                 print(f"[INFO] bus is full, he can't charge more passengers")
                 bus.set_is_charging(False)
 
             # end of the route
-            if bus.get_current_station_index() == bus.get_end_route_index() or bus.get_current_station_index() == 0:
-                bus.change_etat()
-                if bus.get_current_station_index() == bus.get_end_route_index():
-                    print("[RETURN] bus is comming back to the start of the route")
+            if not bus.is_charging() or not bus.is_decharging():
+                if bus.get_current_station_index() == bus.get_end_route_index() or bus.get_current_station_index() == 0:
+                    bus.change_etat()
+                    if bus.get_current_station_index() == bus.get_end_route_index():
+                        print("[RETURN] bus is comming back to the start of the route")

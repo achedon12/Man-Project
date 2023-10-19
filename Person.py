@@ -24,9 +24,6 @@ class Person:
     def __str__(self):
         return f"{self.name} has {len(self.travels)} travels"
 
-    def get_travels(self):
-        return self.travels
-
     def get_travel(self, index):
         return self.travels[index]
 
@@ -46,3 +43,10 @@ class Person:
         for travel in self.travels:
             if travel.is_in_travel():
                 return travel
+
+    def get_done_travels(self):
+        done_travels = []
+        for travel in self.travels:
+            if travel.is_done() or travel.is_in_travel():
+                done_travels.append(travel)
+        return done_travels

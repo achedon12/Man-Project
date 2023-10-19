@@ -1,4 +1,5 @@
 from Message import *
+from Person import Person
 from Test import test_creation_object
 
 
@@ -23,6 +24,7 @@ class Bus:
         self.current_station = self.route[0]
         self.max_passengers = max_passengers
         self.is_charge = False
+        self.is_decharge = False
         self.history = ""
 
         # True = going to the end of the route
@@ -52,7 +54,7 @@ class Bus:
     def add_passenger(self, passenger):
         self.passengers.append(passenger)
 
-    def remove_passenger(self, passenger):
+    def remove_passenger(self, passenger: Person):
         self.passengers.remove(passenger)
 
     def move_station(self):
@@ -61,6 +63,8 @@ class Bus:
 
     def get_next_station(self):
         index = self.route.index(self.current_station)
+        if index == self.get_end_route_index():
+            return self.route[index - 1]
         if self.etat:
             return self.route[index - 1]
         return self.route[index + 1]
@@ -121,6 +125,12 @@ class Bus:
 
     def set_is_charging(self, charge: bool):
         self.is_charge = charge
+
+    def is_decharging(self):
+        return self.is_decharge
+
+    def set_is_decharging(self, decharge: bool):
+        self.is_decharge = decharge
 
     def is_bus_stop(self, station: str):
         return station in self.route

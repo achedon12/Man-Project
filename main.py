@@ -1,9 +1,8 @@
 import Bus
-import Person
 import time
 from Parser import Parser
 
-from sys import argv
+from sys import *
 
 from Board import Board
 
