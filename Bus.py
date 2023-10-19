@@ -23,6 +23,7 @@ class Bus:
         self.current_station = self.route[0]
         self.max_passengers = max_passengers
         self.is_charge = False
+        self.history = ""
 
         # True = going to the end of the route
         self.etat = False
@@ -55,6 +56,7 @@ class Bus:
         self.passengers.remove(passenger)
 
     def move_station(self):
+        self.history += self.current_station
         self.current_station = self.get_next_station()
 
     def get_next_station(self):
@@ -68,6 +70,11 @@ class Bus:
         if self.etat:
             return self.route[index + 1]
         return self.route[index - 1]
+
+    def get_previous_station_from_history(self):
+        if self.history == "":
+            return self.current_station
+        return self.history[-1]
 
     def get_max_passengers(self):
         return self.max_passengers
@@ -117,3 +124,6 @@ class Bus:
 
     def is_bus_stop(self, station: str):
         return station in self.route
+
+    def get_history(self):
+        return self.history

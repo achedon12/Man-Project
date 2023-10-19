@@ -42,10 +42,12 @@ class Board:
             #                           f"{bus.get_current_station()} ({len(bus.get_passengers())}/{bus.get_max_passengers()})")
             #                     break
 
+            # decharge
+
+
             # charge
             for person in self.persons:
                 if not person.is_in_bus():
-                    # charge
                     if not bus.is_full():
                         bus.set_is_charging(True)
                         some_one_enter = False
