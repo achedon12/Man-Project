@@ -1,6 +1,7 @@
 from Message import *
 from Person import Person
 from Test import test_creation_object
+from Travel import Travel
 
 
 def init():
@@ -107,6 +108,9 @@ class Bus:
 
     def is_full(self):
         return len(self.passengers) >= self.max_passengers
+
+    def is_empty(self):
+        return len(self.passengers) == 0
 
     def get_available_seats(self):
         return self.max_passengers - len(self.passengers)
