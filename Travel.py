@@ -25,7 +25,8 @@ class Travel:
         return self.departure_time
 
     def __str__(self):
-        return f"Travel from {self.bus_route_depart} to {self.bus_route_arrive} at {self.departure_time}"
+        etat = str(self.etat).replace("0", "In progress").replace("1", "Done").replace("2", "Not started")
+        return f"Travel from {self.bus_route_depart} to {self.bus_route_arrive} at {self.departure_time} - etat: {etat}"
 
     def is_done(self):
         return self.etat == self.TRAVEL_DONE

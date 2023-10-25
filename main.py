@@ -6,10 +6,16 @@ from Parser import Parser
 from sys import *
 
 from Board import Board
+from Way import Way
 
 if __name__ == '__main__':
-    all_bus = Bus.init()
+    if len(argv) != 2:
+        print("Usage: main.py <file>")
+        exit(1)
+
     all_person = Parser.parse_persons(argv[1])
+    all_way = Way.get_way()
+    all_bus = Bus.init(all_way)
 
     board = Board(all_bus, all_person)
     Logger = Log("logs", all_person, all_bus)

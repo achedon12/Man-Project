@@ -4,7 +4,22 @@ from Test import test_creation_object
 from Travel import Travel
 
 
-def init():
+def init(way: dict):
+    buses = set_bus()
+    for bus in buses:
+        routes = bus.get_route()
+        for index in range(len(routes)):
+            route = routes[index]
+            if index == len(routes):
+                break
+            next_route = routes[index + 1]
+            route = route + next_route
+
+            if way[route] is None:
+                exit(print(bus.get_bus_number()))
+
+
+def set_bus():
     bus1 = Bus(1, 10, 1, 30, 'BACECA')
     bus2 = Bus(2, 10, 1, 30, 'DCEC')
     bus3 = Bus(3, 10, 1, 30, 'BED')

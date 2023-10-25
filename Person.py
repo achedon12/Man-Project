@@ -22,7 +22,10 @@ class Person:
         return self.name
 
     def __str__(self):
-        return f"{self.name} has {len(self.travels)} travels"
+        str = f"{self.name} has {len(self.travels)} travels\n"
+        for travel in self.travels:
+            str += f"\t{travel}\n"
+        return str
 
     def get_travel(self, index):
         return self.travels[index]
@@ -50,3 +53,13 @@ class Person:
             if travel.is_done() or travel.is_in_travel():
                 done_travels.append(travel)
         return done_travels
+
+    def remove_travel(self, travel: Travel):
+        self.travels.remove(travel)
+
+    @staticmethod
+    def get_person_from_name(person_name: str, persons: list):
+        for person in persons:
+            if person.name == person_name:
+                return person
+        return None

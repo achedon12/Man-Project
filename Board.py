@@ -1,5 +1,6 @@
 from Bus import Bus
 from Message import error_board_creation
+from Person import Person
 from Test import test_creation_object
 from Travel import Travel
 
@@ -24,7 +25,8 @@ class Board:
             if current_travel is not None and current_travel.get_bus_route_arrive() == current_station:
                 bus.set_is_decharging(True)
                 person.set_in_bus(False)
-                # current_travel.set_etat(2)
+                person.remove_travel(current_travel)
+                # current_travel.set_etat(Travel.TRAVEL_DONE)
                 print(f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at "
                       f"{current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})")
                 bus.remove_passenger(person)
@@ -38,7 +40,8 @@ class Board:
                 if not bus.is_full():
                     bus.set_is_charging(True)
                     some_one_enter = False
-                    for travel in person.get_travels():
+                    for index in range(len(person.get_travels())):
+                        travel = person.get_travel(index)
                         if float(travel.get_departure_time()) > float(actual_time):
                             continue
 
@@ -93,8 +96,13 @@ class Board:
             print("[INFO] bus is empty, he can't decharge more passengers")
             bus.set_is_decharging(False)
 
-    def next_time(self, actual_time: int):
+    def simulation_time(self, actual_time: int):
         print(f"\n\n------------------- Temps simulation {actual_time} -------------------")
+
+    def next_time(self, actual_time: int):
+
+        self.simulation_time(actual_time)
+
         for bus in self.bus:
             print(f"\n--------BUS{bus.bus_number}------------")
 
