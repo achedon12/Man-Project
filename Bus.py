@@ -6,17 +6,19 @@ from Travel import Travel
 
 def init(way: dict):
     buses = set_bus()
-    for bus in buses:
-        routes = bus.get_route()
-        for index in range(len(routes)):
-            route = routes[index]
-            if index == len(routes):
-                break
-            next_route = routes[index + 1]
-            route = route + next_route
+    # for bus in buses:
+    #     routes = bus.get_route()
+    #     for index in range(len(routes)):
+    #         route = routes[index]
+    #         if index == len(routes):
+    #             break
+    #         next_route = routes[index + 1]
+    #         route = route + next_route
+    #
+    #         if way[route] is None:
+    #             exit(print(bus.get_bus_number()))
 
-            if way[route] is None:
-                exit(print(bus.get_bus_number()))
+    return buses
 
 
 def set_bus():

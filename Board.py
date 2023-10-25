@@ -25,7 +25,7 @@ class Board:
             if current_travel is not None and current_travel.get_bus_route_arrive() == current_station:
                 bus.set_is_decharging(True)
                 person.set_in_bus(False)
-                person.remove_travel(current_travel)
+                # person.remove_travel(current_travel)
                 # current_travel.set_etat(Travel.TRAVEL_DONE)
                 print(f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at "
                       f"{current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})")
