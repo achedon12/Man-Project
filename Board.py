@@ -1,6 +1,5 @@
 from Bus import Bus
 from Message import error_board_creation
-from Person import Person
 from Test import test_creation_object
 from Travel import Travel
 
@@ -9,14 +8,14 @@ class Board:
     def __init__(self, bus: list, persons: list):
         if test_creation_object([bus, persons]):
             raise Exception(error_board_creation)
-        self.bus = bus
-        self.persons = persons
+        self._bus = bus
+        self._persons = persons
 
     def get_bus(self):
-        return self.bus
+        return self._bus
 
     def get_persons(self):
-        return self.persons
+        return self._persons
 
     def decharge(self, bus: Bus, current_station: int, actual_time: int):
         for person in bus.get_passengers():
@@ -31,11 +30,11 @@ class Board:
                       f"{current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})")
                 bus.remove_passenger(person)
                 break
-            if person.name == bus.get_passengers()[-1].name:
+            if person.get_name() == bus.get_passengers()[-1].get_name():
                 bus.set_is_decharging(False)
 
     def charge(self, bus: Bus, current_station: int, actual_time: int):
-        for person in self.persons:
+        for person in self._persons:
             if not person.is_in_bus():
                 if not bus.is_full():
                     bus.set_is_charging(True)
@@ -65,7 +64,7 @@ class Board:
                                 break
                     if some_one_enter:
                         break
-                    if person.name == self.persons[-1].name:
+                    if person.get_name() == self._persons[-1].get_name():
                         bus.set_is_charging(False)
                         break
 
@@ -103,8 +102,8 @@ class Board:
 
         self.simulation_time(actual_time)
 
-        for bus in self.bus:
-            print(f"\n--------BUS{bus.bus_number}------------")
+        for bus in self._bus:
+            print(f"\n--------BUS{bus.get_bus_number()}------------")
 
             current_station = bus.get_current_station()
 

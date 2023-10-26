@@ -1,5 +1,5 @@
 def error_bus_creation(bus: int):
-    return "Error: Bus cannot be created: " + bus
+    return "Error: Bus cannot be created: " + str(bus)
 
 
 def error_person_creation(name: str):

@@ -10,35 +10,35 @@ class Travel:
     def __init__(self, bus_route_depart: str, bus_route_arrive: str, departure_time: int):
         if test_creation_object([bus_route_depart, bus_route_arrive, departure_time]):
             raise Exception(error_travel_creation(bus_route_depart, bus_route_arrive, departure_time))
-        self.bus_route_depart = bus_route_depart
-        self.bus_route_arrive = bus_route_arrive
-        self.departure_time = departure_time
-        self.etat = self.TRAVEL_NOT_STARTED
+        self._bus_route_depart = bus_route_depart
+        self._bus_route_arrive = bus_route_arrive
+        self._departure_time = departure_time
+        self._etat = self.TRAVEL_NOT_STARTED
 
     def get_bus_route_depart(self):
-        return self.bus_route_depart
+        return self._bus_route_depart
 
     def get_bus_route_arrive(self):
-        return self.bus_route_arrive
+        return self._bus_route_arrive
 
     def get_departure_time(self):
-        return self.departure_time
+        return self._departure_time
 
     def __str__(self):
-        etat = str(self.etat).replace("0", "In progress").replace("1", "Done").replace("2", "Not started")
-        return f"Travel from {self.bus_route_depart} to {self.bus_route_arrive} at {self.departure_time} - etat: {etat}"
+        etat = str(self._etat).replace("0", "In progress").replace("1", "Done").replace("2", "Not started")
+        return f"Travel from {self._bus_route_depart} to {self._bus_route_arrive} at {self._departure_time} - etat: {etat}"
 
     def is_done(self):
-        return self.etat == self.TRAVEL_DONE
+        return self._etat == self.TRAVEL_DONE
 
     def is_in_travel(self):
-        return self.etat == self.TRAVEL_IN_PROGRESS
+        return self._etat == self.TRAVEL_IN_PROGRESS
 
     def is_not_started(self):
-        return self.etat == self.TRAVEL_NOT_STARTED
+        return self._etat == self.TRAVEL_NOT_STARTED
 
     def set_etat(self, etat: int):
-        self.etat = etat
+        self._etat = etat
 
     def get_etat(self):
-        return self.etat
+        return self._etat

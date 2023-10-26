@@ -26,10 +26,10 @@ class Log:
 
     def next_time(self, time: int):
         for person in self._persons:
-            self.log(person.name, person.__str__(), "persons", time)
+            self.log(person.get_name(), person.__str__(), "persons", time)
 
         for bus in self._buses:
-            self.log("Bus" + str(bus.bus_number), bus.__str__(), "bus", time)
+            self.log("Bus" + str(bus.get_bus_number()), bus.__str__(), "bus", time)
 
     def log(self, file: str, message: str, type: str, time: int, end: str = "\n"):
         with open(self.get_file(type, file), 'a') as f:
