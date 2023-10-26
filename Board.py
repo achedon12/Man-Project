@@ -45,7 +45,7 @@ class Board:
                         if float(travel.get_departure_time()) > float(actual_time):
                             continue
 
-                        if not travel.is_done():
+                        if not travel.is_done() and travel.is_not_started():
                             if travel.get_bus_route_depart() == current_station and bus.is_bus_stop(
                                     travel.get_bus_route_arrive()):
                                 if bus.get_available_seats() > 0:

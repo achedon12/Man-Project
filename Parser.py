@@ -3,7 +3,7 @@ from Travel import Travel
 
 
 class Parser:
-    
+
     def __init__(self):
         pass
 
@@ -14,18 +14,18 @@ class Parser:
         with open(file) as content:
             lines = content.readlines()
             for line in lines:
-                line = line.replace("\n", "")
-                line = line.split(" ")
-                number = line[0]
-                name = line[1]
-                line = line[2:]
-                travels = []
-                while len(line) > 0:
-                    index = 0
-                    travels.append(Travel(line[index + 1][0], line[index + 1][1], line[index]))
-                    line = line[2:]
-
+                settings = line.split(" ")
+                settings[len(settings) - 1] = settings[len(settings) - 1].replace("\n", "")
+                number = settings[0]
+                name = settings[1]
                 for i in range(int(number)):
+                    copyLine = settings[2:]
+                    travels = []
+                    for index in range(len(copyLine)):
+                        if index % 2 != 0:
+                            continue
+                        travel = Travel(copyLine[index + 1][0], copyLine[index + 1][1], copyLine[index])
+                        travels.append(travel)
                     persons.append(Person(f"{name}{i + 1}", travels))
             content.close()
 
