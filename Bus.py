@@ -4,23 +4,6 @@ from Test import test_creation_object
 
 
 def init(way: dict):
-    buses = set_bus()
-    # for bus in buses:
-    #     routes = bus.get_route()
-    #     for index in range(len(routes)):
-    #         route = routes[index]
-    #         if index == len(routes):
-    #             break
-    #         next_route = routes[index + 1]
-    #         route = route + next_route
-    #
-    #         if way[route] is None:
-    #             exit(print(bus.get_bus_number()))
-
-    return buses
-
-
-def set_bus():
     bus1 = Bus(1, 10, 1, 30, 'BACECA')
     bus2 = Bus(2, 10, 1, 30, 'DCEC')
     bus3 = Bus(3, 10, 1, 30, 'BED')
@@ -43,6 +26,7 @@ class Bus:
         self._is_charge = False
         self._is_decharge = False
         self._history = ""
+        self._direct = False
 
         # True = going to the end of the route
         self._etat = False
@@ -76,7 +60,10 @@ class Bus:
 
     def move_station(self):
         self._history += self._current_station
-        self._current_station = self.get_next_station()
+        if self.is_direct():
+            self._current_station = self.update_station_direct()
+        else:
+            self._current_station = self.get_next_station()
 
     def get_next_station(self):
         index = self._route.index(self._current_station)
@@ -120,6 +107,8 @@ class Bus:
         return len(self._route) - 1
 
     def get_current_station_index(self):
+        print(self._route, self._current_station)
+        # TODO: fix this to continue
         return self._route.index(self._current_station)
 
     def is_full(self):
@@ -157,3 +146,21 @@ class Bus:
 
     def get_history(self):
         return self._history
+
+    def set_direct(self, direct: bool | str):
+        self._direct = direct
+
+    def is_direct(self):
+        return self._direct != False
+
+    def get_direct(self):
+        return self._direct
+
+    def update_station_direct(self):
+        direct = self.get_direct()
+        if type(direct) == str:
+            way = direct[0]
+            print(direct)
+            self.set_direct(direct[1:])
+            print(direct)
+            return way

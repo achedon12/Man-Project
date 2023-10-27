@@ -1,5 +1,8 @@
 from os import path, mkdir, listdir, remove
 
+from Bus import Bus
+from Person import Person
+
 
 class Log:
     def __init__(self, log_repository: str, persons: list, buses: list):
@@ -31,10 +34,11 @@ class Log:
         for bus in self._buses:
             self.log("Bus" + str(bus.get_bus_number()), bus.__str__(), "bus", time)
 
-    def log(self, file: str, message: str, type: str, time: int, end: str = "\n"):
+    def log(self, file: str, message: str, type: str, time: int = None):
         with open(self.get_file(type, file), 'a') as f:
-            f.write(f"---------------------- Time: {time} ----------------------\n")
-            f.write(message + end)
+            if time is not None:
+                f.write(f"---------------------- Time: {time} ----------------------\n")
+            f.write(message + "\n")
 
     def get_log_repository(self):
         return self._log_repository
