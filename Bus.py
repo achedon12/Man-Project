@@ -183,3 +183,6 @@ class Bus:
         direct = direct[1:]
         self.set_direct(direct)
         return way
+
+    def is_route(self, route: str):
+        return route in self._route

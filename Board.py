@@ -21,29 +21,31 @@ class Board:
         return self._persons
 
     def decharge(self, bus: Bus, current_station: int, actual_time: int):
-        if not bus.is_direct():
-            for person in bus.get_passengers():
-                current_travel = person.get_current_travel()
+        if bus.is_direct() and bus.is_route(bus.get_current_station()):
+            if bus.is_empty():
+                bus.set_is_decharging(False)
+            else:
+                for person in bus.get_passengers():
+                    current_travel = person.get_current_travel()
 
-                if current_travel is not None and current_travel.get_bus_route_arrive() == current_station:
-                    bus.set_is_decharging(True)
-                    person.set_in_bus(False)
-                    current_travel.set_etat(Travel.TRAVEL_DONE)
+                    if current_travel is not None and current_travel.get_bus_route_arrive() == current_station:
+                        bus.set_is_decharging(True)
+                        person.set_in_bus(False)
+                        current_travel.set_etat(Travel.TRAVEL_DONE)
 
-                    message = f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at {current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})"
+                        message = f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at {current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})"
 
-                    self.log(person, message, actual_time)
+                        self.log(person, message, actual_time)
 
-                    bus.remove_passenger(person)
-                    break
-                if person.get_name() == bus.get_passengers()[-1].get_name():
-                    bus.set_is_decharging(False)
+                        bus.remove_passenger(person)
+                        break
+                    if person.get_name() == bus.get_passengers()[-1].get_name():
+                        bus.set_is_decharging(False)
         else:
             print(f"[INFO] bus is direct, he can't decharge passengers at station {bus.get_current_station()}")
 
     def charge(self, bus: Bus, current_station: int, actual_time: int):
-        # TODO: chargement au s'il a des station connu
-        if not bus.is_direct():
+        if bus.is_direct() and bus.is_route(bus.get_current_station()):
             for person in self._persons:
                 if not person.is_in_bus():
                     if not bus.is_full():
