@@ -24,5 +24,5 @@ if __name__ == '__main__':
     while True:
         actual_time = int(time.time()) - starTime
         Logger.next_time(actual_time)
-        board.next_time(actual_time, all_way)
+        board.next_time(actual_time, all_way, Logger)
         time.sleep(1)

@@ -13,6 +13,7 @@ class Board:
             raise Exception(error_board_creation)
         self._bus = bus
         self._persons = persons
+        self._logger = None
 
     def get_bus(self):
         return self._bus
@@ -27,22 +28,22 @@ class Board:
             else:
                 for person in bus.get_passengers():
                     current_travel = person.get_current_travel()
-
                     if current_travel is not None and current_travel.get_bus_route_arrive() == current_station:
                         bus.set_is_decharging(True)
                         person.set_in_bus(False)
                         current_travel.set_etat(Travel.TRAVEL_DONE)
 
-                        message = f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at {current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})"
-
-                        self.log(person, message, actual_time)
+                        self.log(bus,
+                                 f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at {current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})")
+                        self.log(person,
+                                 f"[DECHARGING] {person.get_name()} exit from the bus {bus.get_bus_number()} at {current_station} ({len(bus.get_passengers()) - 1}/{bus.get_max_passengers()})")
 
                         bus.remove_passenger(person)
                         break
                     if person.get_name() == bus.get_passengers()[-1].get_name():
                         bus.set_is_decharging(False)
         else:
-            print(f"[INFO] bus is direct, he can't decharge passengers at station {bus.get_current_station()}")
+            self.log(bus, f"[INFO] bus is direct, he can't decharge passengers at station {bus.get_current_station()}")
 
     def charge(self, bus: Bus, current_station: int, actual_time: int):
         if bus.is_route(bus.get_current_station()):
@@ -64,14 +65,18 @@ class Board:
                                         some_one_enter = True
                                         person.set_in_bus(bus.get_bus_number())
                                         travel.set_etat(Travel.TRAVEL_IN_PROGRESS)
-                                        print(
-                                            f"[CHARGING] {person.get_name()} enter in the bus {bus.get_bus_number()} at "
-                                            f"{bus.get_current_station()} ({len(bus.get_passengers())}/{bus.get_max_passengers()})"
-                                            f" for a travel from {travel.get_bus_route_depart()} to {travel.get_bus_route_arrive()}"
-                                            f" at {travel.get_departure_time()}")
+                                        self.log(bus,
+                                                 f"[CHARGING] {person.get_name()} enter in the bus {bus.get_bus_number()} at "
+                                                 f"{bus.get_current_station()} ({len(bus.get_passengers())}/{bus.get_max_passengers()})"
+                                                 f" for a travel from {travel.get_bus_route_depart()} to {travel.get_bus_route_arrive()}"
+                                                 f" at {travel.get_departure_time()}")
+                                        self.log(person, f"[INFO] enter in the bus {bus.get_bus_number()} at "
+                                                         f"{bus.get_current_station()} ({len(bus.get_passengers())}/{bus.get_max_passengers()})"
+                                                         f" for a travel from {travel.get_bus_route_depart()} to {travel.get_bus_route_arrive()}"
+                                                         f" at {travel.get_departure_time()}")
                                         break
                                     else:
-                                        print(f"[INFO] bus is full, {person.get_name()} can't enter")
+                                        self.log(bus, f"[INFO] bus is full, {person.get_name()} can't enter")
                                 if some_one_enter:
                                     break
                         if some_one_enter:
@@ -80,7 +85,7 @@ class Board:
                             bus.set_is_charging(False)
                             break
         else:
-            print(f"[INFO] bus is direct, he can't charge passengers at station {bus.get_current_station()}")
+            self.log(bus, f"[INFO] bus is direct, he can't charge passengers at station {bus.get_current_station()}")
 
     def get_percent(self, current_time: int, time_required: int):
         return round((current_time / time_required) * 100)
@@ -107,24 +112,24 @@ class Board:
                     way = current_station + next_station
                     if way not in ways and way[::-1] not in ways:
                         bus.set_direct(Way.get_fast_way(current_station, next_station, bus.get_etat()))
-                        print(
-                            f"[INFO] bus {bus.get_bus_number()} is now direct from {current_station} to {next_station}"
-                            f" with his new route {bus.get_direct()}")
+                        self.log(bus,
+                                 f"[INFO] bus {bus.get_bus_number()} is now direct from {current_station} to {next_station}"
+                                 f" with his new route {bus.get_direct()}")
                         break
             else:
                 bus.set_direct(Way.get_fast_way(departure, arrival, bus.get_etat()))
                 if bus.get_etat():
-                    print(f"[INFO] bus {bus.get_bus_number()} is now direct from {arrival} to {departure}"
-                          f" with his new route {bus.get_direct()}")
+                    self.log(bus, f"[INFO] bus {bus.get_bus_number()} is now direct from {arrival} to {departure}"
+                                  f" with his new route {bus.get_direct()}")
                 else:
-                    print(f"[INFO] bus {bus.get_bus_number()} is now direct from {departure} to {arrival}"
-                          f" with his new route {bus.get_direct()}")
+                    self.log(bus, f"[INFO] bus {bus.get_bus_number()} is now direct from {departure} to {arrival}"
+                                  f" with his new route {bus.get_direct()}")
 
     def set_no_longer_direct(self, bus: Bus, ways: list):
         if bus.is_direct():
             if len(bus.get_direct()) == 0:
                 bus.set_direct(False)
-                print(f"[INFO] bus is no longer direct")
+                self.log(bus, f"[INFO] bus is no longer direct")
 
                 # end route
                 self.end_route(bus)
@@ -141,9 +146,9 @@ class Board:
         if not bus.is_charging() and not bus.is_decharging():
             if self.travel(bus):
                 bus.move_station()
-                print(
-                    f"[INFO] bus is following the route {bus.get_previous_station_from_history()} to {bus.get_current_station()} from "
-                    f"his route {bus.get_route()} with {len(bus.get_passengers())} passengers")
+                self.log(bus,
+                         f"[INFO] bus is following the route {bus.get_previous_station_from_history()} to {bus.get_current_station()} from "
+                         f"his route {bus.get_route()} with {len(bus.get_passengers())} passengers")
                 self.set_no_longer_direct(bus, ways)
             else:
                 bus.update_time()
@@ -151,36 +156,40 @@ class Board:
                 current_station = bus.get_current_station()
                 current_time = bus.get_time()
                 time_required = Way.get_time_required(current_station, next_station)
-                print(
-                    f"[INFO] bus is traveling from {current_station} to {next_station} ({self.get_percent(current_time, time_required)}%)")
+                self.log(bus,
+                         f"[INFO] bus is traveling from {current_station} to {next_station} ({self.get_percent(current_time, time_required)}%)")
 
         elif bus.is_full():
-            print(f"[INFO] bus is full, he can't charge more passengers")
+            self.log(bus, f"[INFO] bus is full, he can't charge more passengers")
             bus.set_is_charging(False)
 
     def end_route(self, bus: Bus):
         if not bus.is_charging() or not bus.is_decharging():
-            current_station = bus.get_current_station()
             current_station_index = bus.get_current_station_index()
             if current_station_index == bus.get_end_route_index() or current_station_index == 0:
                 bus.change_etat()
                 if bus.get_current_station_index() == bus.get_end_route_index():
-                    print("[RETURN] bus is comming back to the start of the route")
+                    self.log(bus, "[RETURN] bus is comming back to the start of the route")
 
     def departure(self, bus: Bus, current_station: int, actual_time: int):
         if current_station == bus.get_start_route():
-            print(
-                f"[READY] bus is now ready to do the route at time {actual_time}. Departure from {bus.get_start_route()}")
+            self.log(bus,
+                     f"[READY] bus is now ready to do the route at time {actual_time}. Departure from {bus.get_start_route()}")
 
     def stop_decharge(self, bus: Bus):
         if bus.is_empty() and not bus.is_direct():
-            print("[INFO] bus is empty, he can't decharge more passengers")
+            message = "[INFO] bus is empty, he can't decharge more passengers"
+            self.log(bus, message)
             bus.set_is_decharging(False)
 
     def simulation_time(self, actual_time: int):
         print(f"\n\n------------------- Temps simulation {actual_time} -------------------")
 
-    def next_time(self, actual_time: int, ways: list):
+    def next_time(self, actual_time: int, ways: list, logger: Log):
+
+        # init logger
+        if self._logger is None:
+            self._logger = logger
 
         self.simulation_time(actual_time)
 
@@ -207,11 +216,13 @@ class Board:
             # stop decharge if bus is empty
             self.stop_decharge(bus)
 
-    def log(self, data: object, message: str, time: int = None):
-        # TODO: log
-        # if isinstance(data, Bus):
-        #     Log.log("Bus" + str(data.get_bus_number()), message, "bus", time)
-        # elif isinstance(data, Person):
-        #     Log.log(data.get_name(), message, "persons", time)
-
+    def log(self, data: object, message: str):
+        logger = self.get_logger()
+        if isinstance(data, Bus):
+            logger.log("Bus" + str(data.get_bus_number()), message, "bus")
+        elif isinstance(data, Person):
+            logger.log(data.get_name(), message, "persons")
         print(message)
+
+    def get_logger(self):
+        return self._logger
