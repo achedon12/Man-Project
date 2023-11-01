@@ -1,6 +1,4 @@
-from Bus import Bus
 from Message import error_board_creation
-from Person import Person
 from Test import test_creation_object
 from Travel import Travel
 from Log import *
