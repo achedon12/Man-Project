@@ -22,14 +22,22 @@ class Way:
         }
 
     @staticmethod
-    def get_fast_way(departure: str, arrival: str):
+    def get_fast_way(departure: str, arrival: str, is_return: bool):
         ways = Way.get_way()
         way = ""
+        initial_departure = departure
 
-        if departure + arrival in ways or arrival + departure in ways:
+        if departure + arrival in ways:
             way = departure + arrival
+        elif arrival + departure in ways:
+            way = arrival + departure
         else:
             for key, value in ways.items():
+
+                # return way if the bus is in the opposite direction
+                if key[1] == departure:
+                    key = key[1] + key[0]
+
                 if departure in key:
                     if arrival in key:
                         way += arrival
@@ -38,7 +46,6 @@ class Way:
                         way += key[1]
                         departure = key[1]
                 elif arrival in key:
-                    way += arrival
                     if departure in key:
                         way += departure
                         break
@@ -46,4 +53,8 @@ class Way:
                         way += key[1]
                         arrival = key[1]
 
+        if is_return:
+            way = way[::-1]
+            way = way[1:]
+            way += initial_departure
         return way

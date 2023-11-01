@@ -3,7 +3,7 @@ from Person import Person
 from Test import test_creation_object
 
 
-def init(way: dict):
+def init():
     bus1 = Bus(1, 10, 1, 30, 'BACECA')
     bus2 = Bus(2, 10, 1, 30, 'DCEC')
     bus3 = Bus(3, 10, 1, 30, 'BED')
@@ -52,6 +52,9 @@ class Bus:
     def get_route(self):
         return self._route
 
+    def set_route(self, route: str):
+        self._route = route
+
     def add_passenger(self, passenger):
         self._passengers.append(passenger)
 
@@ -61,17 +64,35 @@ class Bus:
     def move_station(self):
         self._history += self._current_station
         if self.is_direct():
-            self._current_station = self.update_station_direct()
+            next_station = self.update_station_direct()
+            self._current_station = next_station
         else:
             self._current_station = self.get_next_station()
 
     def get_next_station(self):
-        index = self._route.index(self._current_station)
-        if index == self.get_end_route_index():
-            return self._route[index - 1]
-        if self._etat:
-            return self._route[index - 1]
-        return self._route[index + 1]
+        if self.is_direct():
+            direct_route = self.get_direct()
+            return direct_route[0]
+        else:
+            if self._current_station not in self._route:
+                index = self._route.index(self.get_current_station_from_history())
+            else:
+                index = self._route.index(self._current_station)
+            if index == self.get_end_route_index():
+                return self._route[index - 1]
+            if self._etat:
+                return self._route[index - 1]
+            return self._route[index + 1]
+
+    def get_current_station_from_history(self):
+        history = self._history
+        history = history[-1]
+        while len(history) > 0:
+            potential_station = history[-1]
+            if potential_station not in self.get_route():
+                history = history[:-1]
+            else:
+                return potential_station
 
     def get_previous_station(self):
         index = self._route.index(self._current_station)
@@ -107,8 +128,8 @@ class Bus:
         return len(self._route) - 1
 
     def get_current_station_index(self):
-        print(self._route, self._current_station)
-        # TODO: fix this to continue
+        if self.is_direct():
+            return -1
         return self._route.index(self._current_station)
 
     def is_full(self):
@@ -158,9 +179,7 @@ class Bus:
 
     def update_station_direct(self):
         direct = self.get_direct()
-        if type(direct) == str:
-            way = direct[0]
-            print(direct)
-            self.set_direct(direct[1:])
-            print(direct)
-            return way
+        way = direct[0]
+        direct = direct[1:]
+        self.set_direct(direct)
+        return way

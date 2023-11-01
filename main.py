@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     all_person = Parser.parse_persons(argv[1])
     all_way = Way.get_way()
-    all_bus = Bus.init(all_way)
+    all_bus = Bus.init()
 
     board = Board(all_bus, all_person)
     Logger = Log("logs", all_person, all_bus)
