@@ -1,3 +1,4 @@
+from Bus import Bus
 from Person import Person
 from Way import Way
 from Travel import Travel
@@ -5,14 +6,11 @@ from Travel import Travel
 
 class Parser:
 
-    def __init__(self):
-        pass
-
     @staticmethod
     def parse_persons(file: str):
         persons = []
 
-        with open(file) as content:
+        with open(file, 'r', encoding='utf-8') as content:
             lines = content.readlines()
             for line in lines:
                 settings = line.split(" ")
@@ -36,7 +34,7 @@ class Parser:
     def parse_routes(file: str):
         routes = []
         number = 1
-        with open(file) as content:
+        with open(file, 'r', encoding='utf-8') as content:
             lines = content.readlines()
             for line in lines:
                 settings = line.split(" ")
@@ -60,6 +58,32 @@ class Parser:
             content.close()
 
         return Parser.convert_list_into_dict(routes, "routes")
+
+    @staticmethod
+    def parse_buses(file: str):
+        buses = []
+        with open(file, 'r', encoding='utf-8') as content:
+            lines = content.readlines()
+            for index in range(len(lines)):
+                line = lines[index]
+                settings = line.split(" ")
+                settings[len(settings) - 1] = settings[len(settings) - 1].replace("\n", "")
+                if settings[0].isdigit():
+                    settings_bus = line.replace("\n", "").split(" ")
+                    bus_numbers = settings_bus[0]
+                    bus_type = settings_bus[2].lower()
+                    settings_capacity = lines[index + 1].replace("\n", "").split(" ")
+                    capacity = settings_capacity[1]
+                    settings_charge_speed = lines[index + 2].replace("\n", "").split(" ")
+                    charge = settings_charge_speed[1]
+                    settings_travel_speed = lines[index + 3].replace("\n", "").split(" ")
+                    distance = settings_travel_speed[1][:-1]
+                    time = settings_travel_speed[2]
+                    index = index + 3
+                    for i in range(int(bus_numbers)):
+                        buses.append(Bus(i + 1, int(capacity), int(charge), int(distance) / int(time), bus_type))
+
+        return buses
 
     @staticmethod
     def convert_list_into_dict(content: list, type: str):

@@ -4,16 +4,17 @@ from Test import test_creation_object
 
 
 def init():
-    bus1 = Bus(1, 10, 1, 30, 'BACECA')
-    bus2 = Bus(2, 10, 1, 30, 'DCEC')
-    bus3 = Bus(3, 10, 1, 30, 'BED')
-    bus4 = Bus(4, 2, 1, 10, 'AC')
+    bus1 = Bus(1, 10, 1, 30, 'bus', 'BACECA')
+    bus2 = Bus(2, 10, 1, 30, 'bus', 'DCEC')
+    bus3 = Bus(3, 10, 1, 30, 'bus', 'BED')
+    bus4 = Bus(4, 2, 1, 10, 'bus', 'AC')
     return [bus1, bus2, bus3, bus4]
 
 
 class Bus:
 
-    def __init__(self, bus_number: int, max_passengers: int, charge_speed: int, travel_speed: int, route: str):
+    def __init__(self, bus_number: int, max_passengers: int, charge_speed: int, travel_speed: int|float, type: str,
+                 route: str = ""):
         if test_creation_object([bus_number, max_passengers, charge_speed, travel_speed, route]):
             raise Exception(error_bus_creation(bus_number))
         self._time = 0
@@ -22,12 +23,16 @@ class Bus:
         self._travel_speed = travel_speed
         self._route = route
         self._passengers = []
-        self._current_station = self._route[0]
+        if route != "":
+            self._current_station = self._route[0]
+        else:
+            self._current_station = ""
         self._max_passengers = max_passengers
         self._is_charge = False
         self._is_decharge = False
         self._history = ""
         self._direct = False
+        self.type = type
 
         # True = going to the end of the route
         self._etat = False
