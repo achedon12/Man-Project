@@ -58,3 +58,16 @@ class Way:
             way = way[1:]
             way += initial_departure
         return way
+
+    @staticmethod
+    def get_time_required(departure: str, arrival: str):
+
+        ways = Way.get_way()
+        way = departure + arrival
+        if way in ways:
+            return ways[way]['time']
+        elif way[::-1] in ways:
+            return ways[way[::-1]]['time']
+        else:
+            return 0
+        pass

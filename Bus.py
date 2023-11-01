@@ -16,6 +16,7 @@ class Bus:
     def __init__(self, bus_number: int, max_passengers: int, charge_speed: int, travel_speed: int, route: str):
         if test_creation_object([bus_number, max_passengers, charge_speed, travel_speed, route]):
             raise Exception(error_bus_creation(bus_number))
+        self._time = 0
         self._bus_number = bus_number
         self._charge_speed = charge_speed
         self._travel_speed = travel_speed
@@ -186,3 +187,9 @@ class Bus:
 
     def is_route(self, route: str):
         return route in self._route
+
+    def get_time(self):
+        return self._time
+
+    def update_time(self, value: int = 1):
+        self._time = self.get_time() + value

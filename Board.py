@@ -21,7 +21,7 @@ class Board:
         return self._persons
 
     def decharge(self, bus: Bus, current_station: int, actual_time: int):
-        if bus.is_direct() and bus.is_route(bus.get_current_station()):
+        if bus.is_route(bus.get_current_station()):
             if bus.is_empty():
                 bus.set_is_decharging(False)
             else:
@@ -45,7 +45,7 @@ class Board:
             print(f"[INFO] bus is direct, he can't decharge passengers at station {bus.get_current_station()}")
 
     def charge(self, bus: Bus, current_station: int, actual_time: int):
-        if bus.is_direct() and bus.is_route(bus.get_current_station()):
+        if bus.is_route(bus.get_current_station()):
             for person in self._persons:
                 if not person.is_in_bus():
                     if not bus.is_full():
@@ -82,8 +82,19 @@ class Board:
         else:
             print(f"[INFO] bus is direct, he can't charge passengers at station {bus.get_current_station()}")
 
+    def get_percent(self, current_time: int, time_required: int):
+        return round((current_time / time_required) * 100)
+
     def next_station(self, bus: Bus, current_station: int, ways: list):
         self.move_bus(bus, ways)
+
+    def travel(self, bus: Bus):
+        next_station = bus.get_next_station()
+        current_station = bus.get_current_station()
+        current_time = bus.get_time()
+        time_required = Way.get_time_required(current_station, next_station)
+
+        return current_time >= time_required
 
     def set_direct(self, bus: Bus, ways: list, departure: str = None, arrival: str = None):
         if not bus.is_direct():
@@ -128,11 +139,21 @@ class Board:
 
     def move_bus(self, bus: Bus, ways: list):
         if not bus.is_charging() and not bus.is_decharging():
-            bus.move_station()
-            print(
-                f"[INFO] bus is following the route {bus.get_previous_station_from_history()} to {bus.get_current_station()} from "
-                f"his route {bus.get_route()} with {len(bus.get_passengers())} passengers")
-            self.set_no_longer_direct(bus, ways)
+            if self.travel(bus):
+                bus.move_station()
+                print(
+                    f"[INFO] bus is following the route {bus.get_previous_station_from_history()} to {bus.get_current_station()} from "
+                    f"his route {bus.get_route()} with {len(bus.get_passengers())} passengers")
+                self.set_no_longer_direct(bus, ways)
+            else:
+                bus.update_time()
+                next_station = bus.get_next_station()
+                current_station = bus.get_current_station()
+                current_time = bus.get_time()
+                time_required = Way.get_time_required(current_station, next_station)
+                print(
+                    f"[INFO] bus is traveling from {current_station} to {next_station} ({self.get_percent(current_time, time_required)}%)")
+
         elif bus.is_full():
             print(f"[INFO] bus is full, he can't charge more passengers")
             bus.set_is_charging(False)
