@@ -2,27 +2,24 @@ import Bus
 import time
 from Log import Log
 from Parser import Parser
-
 from sys import *
-
 from Board import Board
-from Way import Way
 
 if __name__ == '__main__':
-    if len(argv) != 2:
-        print("Usage: main.py <file>")
+    if len(argv) != 3:
+        print("Usage: main.py <person> <route>")
         exit(1)
 
     all_person = Parser.parse_persons(argv[1])
-    all_way = Way.get_way()
     all_bus = Bus.init()
+    all_routes = Parser.parse_routes(argv[2])
 
-    board = Board(all_bus, all_person)
+    board = Board(all_bus, all_person, all_routes)
     Logger = Log("logs", all_person, all_bus)
     starTime = int(time.time())
 
     while True:
         actual_time = int(time.time()) - starTime
         Logger.next_time(actual_time)
-        board.next_time(actual_time, all_way, Logger)
+        board.next_time(actual_time, all_routes, Logger)
         time.sleep(1)

@@ -2,14 +2,14 @@ from Message import error_board_creation
 from Test import test_creation_object
 from Travel import Travel
 from Log import *
-from Way import Way
 
 
 class Board:
-    def __init__(self, bus: list, persons: list):
+    def __init__(self, bus: list, persons: list, ways: dict):
         if test_creation_object([bus, persons]):
             raise Exception(error_board_creation)
         self._bus = bus
+        self._ways = ways
         self._persons = persons
         self._logger = None
 
@@ -95,7 +95,7 @@ class Board:
         next_station = bus.get_next_station()
         current_station = bus.get_current_station()
         current_time = bus.get_time()
-        time_required = Way.get_time_required(current_station, next_station)
+        time_required = self.get_time_required(current_station, next_station)
 
         return current_time >= time_required
 
@@ -109,13 +109,13 @@ class Board:
                     next_station = bus.get_route()[index + 1]
                     way = current_station + next_station
                     if way not in ways and way[::-1] not in ways:
-                        bus.set_direct(Way.get_fast_way(current_station, next_station, bus.get_etat()))
+                        bus.set_direct(self.get_fast_way(current_station, next_station, bus.get_etat()))
                         self.log(bus,
                                  f"[INFO] bus {bus.get_bus_number()} is now direct from {current_station} to {next_station}"
                                  f" with his new route {bus.get_direct()}")
                         break
             else:
-                bus.set_direct(Way.get_fast_way(departure, arrival, bus.get_etat()))
+                bus.set_direct(self.get_fast_way(departure, arrival, bus.get_etat()))
                 if bus.get_etat():
                     self.log(bus, f"[INFO] bus {bus.get_bus_number()} is now direct from {arrival} to {departure}"
                                   f" with his new route {bus.get_direct()}")
@@ -153,7 +153,7 @@ class Board:
                 next_station = bus.get_next_station()
                 current_station = bus.get_current_station()
                 current_time = bus.get_time()
-                time_required = Way.get_time_required(current_station, next_station)
+                time_required = self.get_time_required(current_station, next_station)
                 self.log(bus,
                          f"[INFO] bus is traveling from {current_station} to {next_station} ({self.get_percent(current_time, time_required)}%)")
 
@@ -224,3 +224,58 @@ class Board:
 
     def get_logger(self):
         return self._logger
+
+    def get_routes(self):
+        return self._ways
+
+    def get_fast_way(self, departure: str, arrival: str, is_return: bool):
+        ways = self.get_ways()
+        way = ""
+        initial_departure = departure
+
+        if departure + arrival in ways:
+            way = departure + arrival
+        elif arrival + departure in ways:
+            way = arrival + departure
+        else:
+            for key, value in ways.items():
+
+                # return way if the bus is in the opposite direction
+                if key[1] == departure:
+                    key = key[1] + key[0]
+
+                if departure in key:
+                    if arrival in key:
+                        way += arrival
+                        break
+                    else:
+                        way += key[1]
+                        departure = key[1]
+                elif arrival in key:
+                    if departure in key:
+                        way += departure
+                        break
+                    else:
+                        way += key[1]
+                        arrival = key[1]
+
+        if is_return:
+            way = way[::-1]
+            way = way[1:]
+            way += initial_departure
+        return way
+
+    def get_time_required(self, departure: str, arrival: str):
+
+        ways = self.get_ways()
+        way = departure + arrival
+        if way in ways:
+            return ways[way]['time']
+        elif way[::-1] in ways:
+            return ways[way[::-1]]['time']
+        else:
+            return 0
+        pass
+
+    def get_ways(self):
+        return self._ways

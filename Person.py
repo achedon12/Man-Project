@@ -22,10 +22,10 @@ class Person:
         return self._name
 
     def __str__(self):
-        str = f"{self._name} has {len(self._travels)} travels\n"
+        this = f"{self._name} has {len(self._travels)} travels\n"
         for travel in self._travels:
-            str += f"\t{travel}\n"
-        return str
+            this += f"\t{travel}\n"
+        return this
 
     def get_travel(self, index):
         return self._travels[index]

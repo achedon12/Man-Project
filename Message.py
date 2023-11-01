@@ -17,3 +17,7 @@ def error_travel_add_person(name: str):
 
 def error_board_creation():
     return "Error: Board cannot be created: "
+
+
+def error_route_creation(departure: str, arrival: str, time: int):
+    return "Error: Route cannot be created: " + departure + " to " + arrival + " in " + str(time)
